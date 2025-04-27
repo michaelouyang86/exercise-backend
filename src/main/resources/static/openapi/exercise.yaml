@@ -1,0 +1,623 @@
+openapi: 3.0.3
+info:
+  title: Exercise APIs
+  version: 1.0.0
+
+paths:
+  /authentication/users:
+    post:
+      summary: Authenticate student and teacher and return a JWT token
+      operationId: getUserToken
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetUserTokenRequest'
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+
+  /authentication/admins:
+    post:
+      summary: Authenticate admin and return a JWT token
+      operationId: getAdminToken
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAdminTokenRequest'
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenResponse'
+
+  /student/teachers:
+    get:
+      summary: Get all teachers
+      operationId: getTeachersForStudent
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentGetTeacherResponse'
+
+  /student/teachers/{teacherId}/availabilities:
+    get:
+      summary: Get teacher availability for a specific week
+      operationId: getTeacherAvailabilities
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: isoWeek
+          in: query
+          required: true
+          schema:
+            type: string
+            example: '2025-W16'
+      responses:
+        '200':
+          description: Teacher's availability for the given week
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTeacherAvailabilityResponse'
+
+  /student/schedules:
+    post:
+      summary: Schedule a new class
+      operationId: scheduleClass
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleClassRequest'
+      responses:
+        '201':
+          description: Class scheduled
+    get:
+      summary: Get all scheduled classes
+      operationId: getScheduledClasses
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetScheduledClassResponse'
+
+  /student/schedules/{scheduleId}:
+    delete:
+      summary: Delete a scheduled class
+      operationId: cancelScheduledClass
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Class deleted
+
+  /teacher/availability/recurring:
+    post:
+      summary: Add a recurring availability slot
+      operationId: addTeacherRecurringAvailability
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeacherRecurringAvailabilityRequest'
+      responses:
+        '201':
+          description: Slot added
+    get:
+      summary: Get teacher's recurring availability
+      operationId: getTeacherRecurringAvailabilities
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of recurring time slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTeacherRecurringAvailabilityResponse'
+
+  /teacher/availability/recurring/{recurringId}:
+    delete:
+      summary: Delete a recurring availability slot
+      operationId: deleteTeacherRecurringAvailability
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: recurringId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Slot deleted
+
+  /teacher/availability/exceptions:
+    post:
+      summary: Add an availability exception
+      operationId: addTeacherExceptionAvailability
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeacherExceptionAvailabilityRequest'
+      responses:
+        '201':
+          description: Exception added
+    get:
+      summary: Get availability exceptions
+      operationId: getTeacherExceptionAvailabilities
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of exceptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTeacherExceptionAvailabilityResponse'
+
+  /teacher/availability/exceptions/{exceptionId}:
+    delete:
+      summary: Delete an availability exception
+      operationId: deleteTeacherExceptionAvailability
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: exceptionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Exception deleted
+
+  /teacher/unavailable-dates:
+    post:
+      summary: Add an unavailable date
+      operationId: addTeacherUnavailableDate
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeacherUnavailableDateRequest'
+      responses:
+        '201':
+          description: Date added
+    get:
+      summary: Get teacher's unavailable dates
+      operationId: getTeacherUnavailableDates
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of unavailable dates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTeacherUnavailableDateResponse'
+
+  /teacher/unavailable-dates/{unavailableDateId}:
+    delete:
+      summary: Delete an unavailable date
+      operationId: deleteTeacherUnavailableDate
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: unavailableDateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Date deleted
+
+  /admin/students:
+    post:
+      summary: Create a new student
+      operationId: createStudent
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStudentRequest'
+      responses:
+        '201':
+          description: Student created
+
+  /admin/students/{studentPhone}:
+    get:
+      summary: Get student by phone
+      operationId: getStudentByPhone
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentPhone
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStudentResponse'
+
+  /admin/students/{studentId}:
+    delete:
+      summary: Delete a student
+      operationId: deleteStudent
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Student deleted
+
+  /admin/teachers:
+    post:
+      summary: Create a new teacher
+      operationId: createTeacher
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeacherRequest'
+      responses:
+        '201':
+          description: Teacher created
+    get:
+      summary: Get all teachers
+      operationId: getTeachersForAdmin
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminGetTeacherResponse'
+
+  /admin/teachers/{teacherId}:
+    delete:
+      summary: Delete a teacher
+      operationId: deleteTeacher
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Teacher deleted
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GetUserTokenRequest:
+      type: object
+      required:
+        - phone
+        - password
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+
+    GetAdminTokenRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    UserTokenResponse:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [STUDENT, TEACHER]
+        token:
+          type: string
+
+    AdminTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    GetStudentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    CreateStudentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+
+    StudentGetTeacherResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    AdminGetTeacherResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    CreateTeacherRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+
+    GetTeacherAvailabilityResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        day_of_week:
+          type: string
+          enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+        timeslots:
+          type: array
+          items:
+            type: string
+            format: time
+
+    AddTeacherRecurringAvailabilityRequest:
+      type: object
+      properties:
+        day_of_week:
+          type: string
+          enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+
+    GetTeacherRecurringAvailabilityResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        day_of_week:
+          type: string
+          enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+
+    AddTeacherExceptionAvailabilityRequest:
+      type: object
+      properties:
+        exception_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+
+    GetTeacherExceptionAvailabilityResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        exception_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+
+    AddTeacherUnavailableDateRequest:
+      type: object
+      properties:
+        unavailable_date:
+          type: string
+          format: date
+
+    GetTeacherUnavailableDateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        unavailable_date:
+          type: string
+          format: date
+
+    ScheduleClassRequest:
+      type: object
+      properties:
+        teacher_id:
+          type: integer
+        class_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+
+    GetScheduledClassResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        teacher_id:
+          type: integer
+        class_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
