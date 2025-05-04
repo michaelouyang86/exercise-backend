@@ -3,8 +3,7 @@ package com.michael.exercise.models;
 import lombok.Data;
 
 @Data
-public class Admin {
+public class TeacherIdAndName {
     private int id;
-    private String username;
-    private String password;
+    private String name;
 }

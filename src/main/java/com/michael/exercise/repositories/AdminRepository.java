@@ -17,10 +17,11 @@ public class AdminRepository {
     private final JdbcTemplate jdbcTemplate;
     private final AdminRowMapper adminRowMapper;
 
+    // For authentication
     public Admin getAdminByUsername(String username) {
         String sql = """
             SELECT
-                id, username, password, created_at
+                id, username, password
             FROM admins
             WHERE username = ?;""";
         try {

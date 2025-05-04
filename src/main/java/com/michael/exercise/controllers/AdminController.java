@@ -6,16 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.michael.exercise.dtos.AdminGetTeacherResponse;
 import com.michael.exercise.dtos.CreateStudentRequest;
 import com.michael.exercise.dtos.CreateTeacherRequest;
-import com.michael.exercise.dtos.GetStudentResponse;
+import com.michael.exercise.dtos.StudentResponse;
+import com.michael.exercise.dtos.TeacherForAdminResponse;
 import com.michael.exercise.mappers.StudentMapper;
 import com.michael.exercise.mappers.TeacherMapper;
 import com.michael.exercise.models.Student;
 import com.michael.exercise.models.Teacher;
-import com.michael.exercise.services.StudentService;
-import com.michael.exercise.services.TeacherService;
+import com.michael.exercise.services.AdminService;
 
 import lombok.AllArgsConstructor;
 
@@ -23,23 +22,22 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AdminController implements AdminApi {
 
-    private final StudentService studentService;
-    private final TeacherService teacherService;
+    private final AdminService adminService;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
 
     @Override
     public ResponseEntity<Void> createStudent(CreateStudentRequest request) {
-        studentService.createStudent(request);
+        adminService.createStudent(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
     @Override
-    public ResponseEntity<GetStudentResponse> getStudentByPhone(String studentPhone) {
-        Student student = studentService.getStudentByPhone(studentPhone);
-        GetStudentResponse response = studentMapper.toGetStudentResponse(student);
+    public ResponseEntity<StudentResponse> getStudentByPhone(String studentPhone) {
+        Student student = adminService.getStudentByPhone(studentPhone);
+        StudentResponse response = studentMapper.toStudentResponse(student);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
@@ -47,7 +45,7 @@ public class AdminController implements AdminApi {
 
     @Override
     public ResponseEntity<Void> deleteStudent(Integer studentId) {
-        studentService.deleteStudent(studentId);
+        adminService.deleteStudent(studentId);
         return ResponseEntity
                 .noContent()
                 .build();
@@ -55,16 +53,16 @@ public class AdminController implements AdminApi {
 
     @Override
     public ResponseEntity<Void> createTeacher(CreateTeacherRequest request) {
-        teacherService.createTeacher(request);
+        adminService.createTeacher(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
     @Override
-    public ResponseEntity<List<AdminGetTeacherResponse>> getTeachersForAdmin() {
-        List<Teacher> teachers = teacherService.getTeachers();
-        List<AdminGetTeacherResponse> response = teacherMapper.toAdminGetTeacherResponseList(teachers);
+    public ResponseEntity<List<TeacherForAdminResponse>> listTeachersForAdmin() {
+        List<Teacher> teachers = adminService.listTeachersForAdmin();
+        List<TeacherForAdminResponse> response = teacherMapper.toTeacherForAdminResponseList(teachers);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
@@ -72,7 +70,7 @@ public class AdminController implements AdminApi {
 
     @Override
     public ResponseEntity<Void> deleteTeacher(Integer teacherId) {
-        teacherService.deleteTeacher(teacherId);
+        adminService.deleteTeacher(teacherId);
         return ResponseEntity
                 .noContent()
                 .build();

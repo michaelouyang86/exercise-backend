@@ -8,14 +8,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class SecurityUtil {
 
-    public static int getStudentId() {
-        Authentication authentication = 
-            SecurityContextHolder.getContext().getAuthentication();
-
-        return Integer.parseInt(authentication.getName());
-    }
-
-    public static int getTeacherId() {
+    public static int getUserId() {
         Authentication authentication = 
             SecurityContextHolder.getContext().getAuthentication();
 

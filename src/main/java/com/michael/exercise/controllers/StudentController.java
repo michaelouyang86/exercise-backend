@@ -6,18 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.michael.exercise.dtos.GetScheduledClassResponse;
-import com.michael.exercise.dtos.GetTeacherAvailabilityResponse;
 import com.michael.exercise.dtos.ScheduleClassRequest;
-import com.michael.exercise.dtos.StudentGetTeacherResponse;
+import com.michael.exercise.dtos.ScheduledClassResponse;
+import com.michael.exercise.dtos.TeacherAvailabilityResponse;
+import com.michael.exercise.dtos.TeacherForStudentResponse;
 import com.michael.exercise.mappers.StudentMapper;
 import com.michael.exercise.mappers.TeacherMapper;
-import com.michael.exercise.models.ScheduledClass;
-import com.michael.exercise.models.Teacher;
+import com.michael.exercise.models.ScheduledClassWithName;
 import com.michael.exercise.models.TeacherAvailability;
+import com.michael.exercise.models.TeacherIdAndName;
 import com.michael.exercise.security.SecurityUtil;
 import com.michael.exercise.services.StudentService;
-import com.michael.exercise.services.TeacherService;
 
 import lombok.AllArgsConstructor;
 
@@ -26,23 +25,22 @@ import lombok.AllArgsConstructor;
 public class StudentController implements StudentApi {
 
     private final StudentService studentService;
-    private final TeacherService teacherService;
-    private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
+    private final StudentMapper studentMapper;
 
     @Override
-    public ResponseEntity<List<StudentGetTeacherResponse>> getTeachersForStudent() {
-        List<Teacher> teachers = teacherService.getTeachers();
-        List<StudentGetTeacherResponse> response = teacherMapper.toStudentGetTeacherResponseList(teachers);
+    public ResponseEntity<List<TeacherForStudentResponse>> listTeachersForStudent() {
+        List<TeacherIdAndName> teachersIdAndName = studentService.listTeachersForStudent();
+        List<TeacherForStudentResponse> response = teacherMapper.toTeacherForStudentResponseList(teachersIdAndName);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
     }
 
     @Override
-    public ResponseEntity<List<GetTeacherAvailabilityResponse>> getTeacherAvailabilities(Integer teacherId, String isoWeek) {
-        List<TeacherAvailability> teacherAvailabilities = teacherService.getTeacherAvailabilities(teacherId, isoWeek);
-        List<GetTeacherAvailabilityResponse> response = teacherMapper.toGetTeacherAvailabilityResponseList(teacherAvailabilities);
+    public ResponseEntity<List<TeacherAvailabilityResponse>> fetchTeacherAvailabilities(Integer teacherId, String isoWeek) {
+        List<TeacherAvailability> teacherAvailabilities = studentService.fetchTeacherAvailabilities(teacherId, isoWeek);
+        List<TeacherAvailabilityResponse> response = teacherMapper.toTeacherAvailabilityResponseList(teacherAvailabilities);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
@@ -50,7 +48,7 @@ public class StudentController implements StudentApi {
 
     @Override
     public ResponseEntity<Void> scheduleClass(ScheduleClassRequest request) {
-        int studentId = SecurityUtil.getStudentId();
+        int studentId = SecurityUtil.getUserId();
         studentService.scheduleClass(studentId, request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -58,19 +56,19 @@ public class StudentController implements StudentApi {
     }
 
     @Override
-    public ResponseEntity<List<GetScheduledClassResponse>> getScheduledClasses() {
-        int studentId = SecurityUtil.getStudentId();
-        List<ScheduledClass> scheduleClasses = studentService.getScheduledClasses(studentId);
-        List<GetScheduledClassResponse> response = studentMapper.toGetScheduledClassResponseList(scheduleClasses);
+    public ResponseEntity<List<ScheduledClassResponse>> listScheduledClasses(Boolean isPast) {
+        int studentId = SecurityUtil.getUserId();
+        List<ScheduledClassWithName> scheduledClassesWithName = studentService.listScheduledClasses(studentId, isPast);
+        List<ScheduledClassResponse> response = studentMapper.toScheduledClassResponseList(scheduledClassesWithName);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
     }
 
     @Override
-    public ResponseEntity<Void> cancelScheduledClass(Integer scheduleId) {
-        int studentId = SecurityUtil.getStudentId();
-        studentService.cancelScheduledClass(studentId, scheduleId);
+    public ResponseEntity<Void> cancelClass(Integer scheduleId) {
+        int studentId = SecurityUtil.getUserId();
+        studentService.cancelClass(studentId, scheduleId);
         return ResponseEntity
                 .noContent()
                 .build();

@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import com.michael.exercise.dtos.GetScheduledClassResponse;
-import com.michael.exercise.dtos.GetStudentResponse;
-import com.michael.exercise.models.ScheduledClass;
+import com.michael.exercise.dtos.ScheduledClassResponse;
+import com.michael.exercise.dtos.StudentResponse;
+import com.michael.exercise.models.ScheduledClassWithName;
 import com.michael.exercise.models.Student;
 
 @Mapper(componentModel = "spring")
 public interface StudentMapper {
 
-    GetStudentResponse toGetStudentResponse(Student student);
+    StudentResponse toStudentResponse(Student student);
 
-    List<GetScheduledClassResponse> toGetScheduledClassResponseList(List<ScheduledClass> scheduledClasses);
+    List<ScheduledClassResponse> toScheduledClassResponseList(List<ScheduledClassWithName> scheduledClassesWithName);
 }

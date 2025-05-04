@@ -7,12 +7,12 @@ import org.mapstruct.Mapper;
 
 import com.michael.exercise.dtos.AddTeacherExceptionAvailabilityRequest;
 import com.michael.exercise.dtos.AddTeacherRecurringAvailabilityRequest;
-import com.michael.exercise.dtos.AdminGetTeacherResponse;
-import com.michael.exercise.dtos.GetTeacherAvailabilityResponse;
-import com.michael.exercise.dtos.GetTeacherExceptionAvailabilityResponse;
-import com.michael.exercise.dtos.GetTeacherRecurringAvailabilityResponse;
-import com.michael.exercise.dtos.GetTeacherUnavailableDateResponse;
-import com.michael.exercise.dtos.StudentGetTeacherResponse;
+import com.michael.exercise.dtos.TeacherAvailabilityResponse;
+import com.michael.exercise.dtos.TeacherExceptionAvailabilityResponse;
+import com.michael.exercise.dtos.TeacherForAdminResponse;
+import com.michael.exercise.dtos.TeacherForStudentResponse;
+import com.michael.exercise.dtos.TeacherRecurringAvailabilityResponse;
+import com.michael.exercise.dtos.TeacherUnavailableDateResponse;
 import com.michael.exercise.models.TeacherRecurringAvailability;
 import com.michael.exercise.models.TeacherUnavailableDate;
 import com.michael.exercise.models.AddTeacherExceptionAvailability;
@@ -21,22 +21,23 @@ import com.michael.exercise.models.DayOfWeekEnum;
 import com.michael.exercise.models.Teacher;
 import com.michael.exercise.models.TeacherAvailability;
 import com.michael.exercise.models.TeacherExceptionAvailability;
+import com.michael.exercise.models.TeacherIdAndName;
 
 @Mapper(componentModel = "spring")
 public interface TeacherMapper {
 
-    List<StudentGetTeacherResponse> toStudentGetTeacherResponseList(List<Teacher> teachers);
+    List<TeacherForStudentResponse> toTeacherForStudentResponseList(List<TeacherIdAndName> teachersIdAndName);
 
-    List<AdminGetTeacherResponse> toAdminGetTeacherResponseList(List<Teacher> teachers);
+    List<TeacherAvailabilityResponse> toTeacherAvailabilityResponseList(List<TeacherAvailability> teacherAvailabilities);
 
-    List<GetTeacherAvailabilityResponse> toGetTeacherAvailabilityResponseList(List<TeacherAvailability> teacherAvailabilities);
+    List<TeacherForAdminResponse> toTeacherForAdminResponseList(List<Teacher> teachers);
 
-    List<GetTeacherRecurringAvailabilityResponse> toGetRecurringAvailabilityResponseList(List<TeacherRecurringAvailability> recurringAvailabilities);
+    List<TeacherRecurringAvailabilityResponse> toRecurringAvailabilityResponseList(List<TeacherRecurringAvailability> recurringAvailabilities);
 
-    default GetTeacherRecurringAvailabilityResponse toGetRecurringAvailabilityResponse(TeacherRecurringAvailability recurringAvailability) {
-        GetTeacherRecurringAvailabilityResponse response = new GetTeacherRecurringAvailabilityResponse();
+    default TeacherRecurringAvailabilityResponse toRecurringAvailabilityResponse(TeacherRecurringAvailability recurringAvailability) {
+        TeacherRecurringAvailabilityResponse response = new TeacherRecurringAvailabilityResponse();
         response.setId(recurringAvailability.getId());
-        response.setDayOfWeek(GetTeacherRecurringAvailabilityResponse.DayOfWeekEnum.fromValue(recurringAvailability.getDayOfWeek().getValue()));
+        response.setDayOfWeek(TeacherRecurringAvailabilityResponse.DayOfWeekEnum.fromValue(recurringAvailability.getDayOfWeek().getValue()));
         response.setStartTime(recurringAvailability.getStartTime().toString());
         if (LocalTime.of(23, 59, 59).equals(recurringAvailability.getEndTime())) {
             response.setEndTime("24:00");
@@ -46,10 +47,10 @@ public interface TeacherMapper {
         return response;
     }
 
-    List<GetTeacherExceptionAvailabilityResponse> toGetTeacherExceptionAvailabilityResponseList(List<TeacherExceptionAvailability> exceptionAvailabilities);
+    List<TeacherExceptionAvailabilityResponse> toTeacherExceptionAvailabilityResponseList(List<TeacherExceptionAvailability> exceptionAvailabilities);
 
-    default GetTeacherExceptionAvailabilityResponse toGetTeacherExceptionAvailabilityResponse(TeacherExceptionAvailability exceptionAvailability) {
-        GetTeacherExceptionAvailabilityResponse response = new GetTeacherExceptionAvailabilityResponse();
+    default TeacherExceptionAvailabilityResponse toTeacherExceptionAvailabilityResponse(TeacherExceptionAvailability exceptionAvailability) {
+        TeacherExceptionAvailabilityResponse response = new TeacherExceptionAvailabilityResponse();
         response.setId(exceptionAvailability.getId());
         response.setExceptionDate(exceptionAvailability.getExceptionDate());
         response.setStartTime(exceptionAvailability.getStartTime().toString());
@@ -61,7 +62,7 @@ public interface TeacherMapper {
         return response;
     }
 
-    List<GetTeacherUnavailableDateResponse> toGetTeacherUnavailableDateResponseList(List<TeacherUnavailableDate> teacherUnavailableDates);
+    List<TeacherUnavailableDateResponse> toTeacherUnavailableDateResponseList(List<TeacherUnavailableDate> teacherUnavailableDates);
 
     default AddTeacherRecurringAvailability toAddTeacherRecurringAvailability(int teacherId, AddTeacherRecurringAvailabilityRequest request) {
         AddTeacherRecurringAvailability recurringAvailability = new AddTeacherRecurringAvailability();

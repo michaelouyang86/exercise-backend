@@ -46,8 +46,8 @@ paths:
 
   /student/teachers:
     get:
-      summary: Get all teachers
-      operationId: getTeachersForStudent
+      summary: List all teachers
+      operationId: listTeachersForStudent
       tags:
         - Student
       security:
@@ -60,12 +60,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StudentGetTeacherResponse'
+                  $ref: '#/components/schemas/TeacherForStudentResponse'
 
   /student/teachers/{teacherId}/availabilities:
     get:
-      summary: Get teacher availability for a specific week
-      operationId: getTeacherAvailabilities
+      summary: Fetch teacher availability for a specific week
+      operationId: fetchTeacherAvailabilities
       tags:
         - Student
       security:
@@ -90,7 +90,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetTeacherAvailabilityResponse'
+                  $ref: '#/components/schemas/TeacherAvailabilityResponse'
 
   /student/schedules:
     post:
@@ -110,12 +110,22 @@ paths:
         '201':
           description: Class scheduled
     get:
-      summary: Get all scheduled classes
-      operationId: getScheduledClasses
+      summary: List scheduled classes
+      operationId: listScheduledClasses
       tags:
         - Student
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: isPast
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: |
+            - `true`: returns classes before today.
+            - `false`: returns classes on or after today.
       responses:
         '200':
           description: List of schedules
@@ -124,12 +134,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetScheduledClassResponse'
+                  $ref: '#/components/schemas/ScheduledClassResponse'
 
   /student/schedules/{scheduleId}:
     delete:
-      summary: Delete a scheduled class
-      operationId: cancelScheduledClass
+      summary: Cancel a scheduled class
+      operationId: cancelClass
       tags:
         - Student
       security:
@@ -161,8 +171,8 @@ paths:
         '201':
           description: Slot added
     get:
-      summary: Get teacher's recurring availability
-      operationId: getTeacherRecurringAvailabilities
+      summary: List teacher's recurring availability
+      operationId: listTeacherRecurringAvailabilities
       tags:
         - Teacher
       security:
@@ -175,7 +185,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetTeacherRecurringAvailabilityResponse'
+                  $ref: '#/components/schemas/TeacherRecurringAvailabilityResponse'
 
   /teacher/availability/recurring/{recurringId}:
     delete:
@@ -212,8 +222,8 @@ paths:
         '201':
           description: Exception added
     get:
-      summary: Get availability exceptions
-      operationId: getTeacherExceptionAvailabilities
+      summary: List upcoming availability exceptions
+      operationId: listUpcomingTeacherExceptionAvailabilities
       tags:
         - Teacher
       security:
@@ -226,7 +236,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetTeacherExceptionAvailabilityResponse'
+                  $ref: '#/components/schemas/TeacherExceptionAvailabilityResponse'
 
   /teacher/availability/exceptions/{exceptionId}:
     delete:
@@ -263,8 +273,8 @@ paths:
         '201':
           description: Date added
     get:
-      summary: Get teacher's unavailable dates
-      operationId: getTeacherUnavailableDates
+      summary: List upcoming teacher's unavailable dates
+      operationId: listUpcomingTeacherUnavailableDates
       tags:
         - Teacher
       security:
@@ -277,7 +287,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetTeacherUnavailableDateResponse'
+                  $ref: '#/components/schemas/TeacherUnavailableDateResponse'
 
   /teacher/unavailable-dates/{unavailableDateId}:
     delete:
@@ -335,7 +345,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetStudentResponse'
+                $ref: '#/components/schemas/StudentResponse'
 
   /admin/students/{studentId}:
     delete:
@@ -373,8 +383,8 @@ paths:
         '201':
           description: Teacher created
     get:
-      summary: Get all teachers
-      operationId: getTeachersForAdmin
+      summary: List all teachers
+      operationId: listTeachersForAdmin
       tags:
         - Admin
       security:
@@ -387,7 +397,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AdminGetTeacherResponse'
+                  $ref: '#/components/schemas/TeacherForAdminResponse'
 
   /admin/teachers/{teacherId}:
     delete:
@@ -452,7 +462,7 @@ components:
         token:
           type: string
 
-    GetStudentResponse:
+    StudentResponse:
       type: object
       properties:
         id:
@@ -463,7 +473,7 @@ components:
           type: string
         email:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
 
@@ -476,8 +486,11 @@ components:
           type: string
         email:
           type: string
+        points:
+          type: integer
+          default: 0
 
-    StudentGetTeacherResponse:
+    TeacherForStudentResponse:
       type: object
       properties:
         id:
@@ -485,7 +498,7 @@ components:
         name:
           type: string
 
-    AdminGetTeacherResponse:
+    TeacherForAdminResponse:
       type: object
       properties:
         id:
@@ -496,7 +509,7 @@ components:
           type: string
         email:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
 
@@ -510,13 +523,13 @@ components:
         email:
           type: string
 
-    GetTeacherAvailabilityResponse:
+    TeacherAvailabilityResponse:
       type: object
       properties:
         date:
           type: string
           format: date
-        day_of_week:
+        dayOfWeek:
           type: string
           enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
         timeslots:
@@ -528,96 +541,96 @@ components:
     AddTeacherRecurringAvailabilityRequest:
       type: object
       properties:
-        day_of_week:
+        dayOfWeek:
           type: string
           enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
-        start_time:
+        startTime:
           type: string
           format: time
-        end_time:
+        endTime:
           type: string
           format: time
 
-    GetTeacherRecurringAvailabilityResponse:
+    TeacherRecurringAvailabilityResponse:
       type: object
       properties:
         id:
           type: integer
-        day_of_week:
+        dayOfWeek:
           type: string
           enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
-        start_time:
+        startTime:
           type: string
           format: time
-        end_time:
+        endTime:
           type: string
           format: time
 
     AddTeacherExceptionAvailabilityRequest:
       type: object
       properties:
-        exception_date:
+        exceptionDate:
           type: string
           format: date
-        start_time:
+        startTime:
           type: string
           format: time
-        end_time:
+        endTime:
           type: string
           format: time
 
-    GetTeacherExceptionAvailabilityResponse:
+    TeacherExceptionAvailabilityResponse:
       type: object
       properties:
         id:
           type: integer
-        exception_date:
+        exceptionDate:
           type: string
           format: date
-        start_time:
+        startTime:
           type: string
           format: time
-        end_time:
+        endTime:
           type: string
 
     AddTeacherUnavailableDateRequest:
       type: object
       properties:
-        unavailable_date:
+        unavailableDate:
           type: string
           format: date
 
-    GetTeacherUnavailableDateResponse:
+    TeacherUnavailableDateResponse:
       type: object
       properties:
         id:
           type: integer
-        unavailable_date:
+        unavailableDate:
           type: string
           format: date
 
     ScheduleClassRequest:
       type: object
       properties:
-        teacher_id:
+        teacherId:
           type: integer
-        class_date:
+        classDate:
           type: string
           format: date
-        start_time:
+        startTime:
           type: string
           format: time
 
-    GetScheduledClassResponse:
+    ScheduledClassResponse:
       type: object
       properties:
         id:
           type: integer
-        teacher_id:
-          type: integer
-        class_date:
+        teacherName:
+          type: string
+        classDate:
           type: string
           format: date
-        start_time:
+        startTime:
           type: string
           format: time
