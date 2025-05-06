@@ -36,9 +36,9 @@ CREATE TABLE scheduled_classes (
 CREATE TABLE student_points (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL UNIQUE,
-    points INT NOT NULL CHECK (points >= 0 AND points <= 30),
+    points INT NOT NULL CHECK (points >= 0),
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(id)
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE student_points_records (
@@ -48,7 +48,7 @@ CREATE TABLE student_points_records (
     reason VARCHAR(100) NOT NULL,
     points_after_adjustment INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(id)
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE student_notes (
@@ -56,7 +56,7 @@ CREATE TABLE student_notes (
     student_id INT NOT NULL,
     note TEXT NOT NULL,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(id)
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE teacher_recurring_availabilities (
@@ -66,7 +66,7 @@ CREATE TABLE teacher_recurring_availabilities (
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (teacher_id) REFERENCES users(id)
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE teacher_exception_availabilities (
@@ -76,7 +76,7 @@ CREATE TABLE teacher_exception_availabilities (
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (teacher_id) REFERENCES users(id)
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE teacher_unavailable_dates (
@@ -84,7 +84,7 @@ CREATE TABLE teacher_unavailable_dates (
     teacher_id INT NOT NULL,
     unavailable_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (teacher_id) REFERENCES users(id)
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- This script is used to manage the creation of an admin user in the database.

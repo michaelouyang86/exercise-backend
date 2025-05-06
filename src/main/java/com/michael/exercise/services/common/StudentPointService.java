@@ -1,7 +1,10 @@
 package com.michael.exercise.services.common;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.michael.exercise.models.StudentPointsRecord;
 import com.michael.exercise.repositories.StudentPointRecordRepository;
 import com.michael.exercise.repositories.StudentPointRepository;
 
@@ -22,25 +25,33 @@ public class StudentPointService {
         }
     }
 
+    public int getStudentPoints(int studentId) {
+        return studentPointRepository.getStudentPoints(studentId);
+    }
+
     public int getStudentPointsForUpdate(int studentId) {
         return studentPointRepository.getStudentPointsForUpdate(studentId);
     }
 
-    public void deductOnePointFromStudent(int studentId, int currentPoints) {
+    public List<StudentPointsRecord> listStudentPointsRecords(int studentId) {
+        return studentPointRecordRepository.listStudentPointsRecords(studentId);
+    }
+
+    public void deductOnePointFromStudent(int studentId, int currentPoints, String reason) {
+        // Set student points to the new value
         int adjustedPoints = -1;
         int pointsAfterAdjustment = currentPoints + adjustedPoints;
         studentPointRepository.setStudentPoints(studentId, pointsAfterAdjustment);
         // Create a record for the point deduction
-        String reason = "預約課程";
         studentPointRecordRepository.addStudentPointRecord(studentId, adjustedPoints, reason, pointsAfterAdjustment);
     }
 
-    public void refundOnePointToStudent(int studentId, int currentPoints) {
+    public void refundOnePointToStudent(int studentId, int currentPoints, String reason) {
+        // Set student points to the new value
         int adjustedPoints = 1;
         int pointsAfterAdjustment = currentPoints + adjustedPoints;
         studentPointRepository.setStudentPoints(studentId, pointsAfterAdjustment);
         // Create a record for the point refund
-        String reason = "取消預約課程";
         studentPointRecordRepository.addStudentPointRecord(studentId, adjustedPoints, reason, pointsAfterAdjustment);
     }
 }

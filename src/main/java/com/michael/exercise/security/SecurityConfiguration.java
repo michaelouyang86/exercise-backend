@@ -36,12 +36,12 @@ public class SecurityConfiguration {
                 .requestMatchers("/openapi/exercise.yaml").permitAll()
 
                 // Public authentication endpoints
-                .requestMatchers("/authentication/**").permitAll()
+                .requestMatchers("/v*/authentication/**").permitAll()
 
                 // Role-based access control
-                .requestMatchers("/student/**").hasRole("STUDENT")
-                .requestMatchers("/teacher/**").hasRole("TEACHER")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/v*/student/**").hasRole("STUDENT")
+                .requestMatchers("/v*/teacher/**").hasRole("TEACHER")
+                .requestMatchers("/v*/admin/**").hasRole("ADMIN")
                 
                 // Block all other requests
                 .anyRequest().denyAll()

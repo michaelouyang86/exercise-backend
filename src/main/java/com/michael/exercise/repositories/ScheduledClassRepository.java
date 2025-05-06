@@ -33,6 +33,19 @@ public class ScheduledClassRepository {
             request.getClassDate(), request.getStartTime());
     }
 
+    public ScheduledClassWithName getScheduledClass(int id) {
+        String sql = """
+            SELECT
+                sc.id, sc.student_id, student_user.name AS student_name,
+                sc.teacher_id, teacher_user.name AS teacher_name,
+                sc.class_date, sc.start_time
+            FROM scheduled_classes sc
+            JOIN users student_user ON sc.student_id = student_user.id
+            JOIN users teacher_user ON sc.teacher_id = teacher_user.id
+            WHERE sc.id = ?;""";
+        return jdbcTemplate.queryForObject(sql, scheduledClassWithNameRowMapper, id);
+    }
+
     public List<ScheduledClassWithName> listStudentScheduledClasses(int studentId) {
         String sql = """
             SELECT
@@ -63,11 +76,11 @@ public class ScheduledClassRepository {
         return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, studentId);
     }
 
-    public void cancelClass(int studentId, int scheduledClassId) {
+    public int cancelClass(int studentId, int scheduledClassId) {
         String sql = """
             DELETE FROM scheduled_classes
             WHERE student_id = ? AND id = ?;""";
-        jdbcTemplate.update(sql, studentId, scheduledClassId);
+        return jdbcTemplate.update(sql, studentId, scheduledClassId);
     }
 
     public List<ScheduledClass> listTeacherScheduledClasses(int teacherId, LocalDate classDate) {

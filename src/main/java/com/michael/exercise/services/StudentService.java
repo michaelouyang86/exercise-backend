@@ -16,6 +16,7 @@ import com.michael.exercise.dtos.ScheduleClassRequest;
 import com.michael.exercise.exception.BadRequestException;
 import com.michael.exercise.models.ScheduledClass;
 import com.michael.exercise.models.ScheduledClassWithName;
+import com.michael.exercise.models.StudentPointsRecord;
 import com.michael.exercise.models.TeacherAvailability;
 import com.michael.exercise.models.TeacherExceptionAvailability;
 import com.michael.exercise.models.TeacherIdAndName;
@@ -133,7 +134,13 @@ public class StudentService {
         // Schedule the class
         scheduledClassRepository.scheduleClass(studentId, request);
         // Deduct points from the student
-        studentPointService.deductOnePointFromStudent(studentId, currentPoints);
+        String teacherName = userRepository.getTeacherIdAndName(request.getTeacherId()).getName();
+        String reason = String.format("[預約課程] %s, %s, %s", teacherName, request.getClassDate(), request.getStartTime());
+        studentPointService.deductOnePointFromStudent(studentId, currentPoints, reason);
+    }
+
+    public ScheduledClassWithName getScheduledClass(int id) {
+        return scheduledClassRepository.getScheduledClass(id);
     }
 
     public List<ScheduledClassWithName> listScheduledClasses(int studentId, boolean isPast) {
@@ -144,11 +151,23 @@ public class StudentService {
     }
 
     @Transactional
-    public void cancelClass(int studentId, int scheduledClassId) {
+    public void cancelClass(int studentId, ScheduledClassWithName scheduledClassWithName) {
         // Cancel the scheduled class
-        scheduledClassRepository.cancelClass(studentId, scheduledClassId);
+        int affectedRows = scheduledClassRepository.cancelClass(studentId, scheduledClassWithName.getId());
+        if (affectedRows != 1) {
+            throw new BadRequestException("cancel_class_failed", "取消預約失敗");
+        }
         // Refund points to the student
         int currentPoints = studentPointService.getStudentPointsForUpdate(studentId);
-        studentPointService.refundOnePointToStudent(studentId, currentPoints);
+        String reason = String.format("[取消預約] %s, %s, %s", scheduledClassWithName.getTeacherName(), scheduledClassWithName.getClassDate(), scheduledClassWithName.getStartTime());
+        studentPointService.refundOnePointToStudent(studentId, currentPoints, reason);
+    }
+
+    public int getStudentPoints(int studentId) {
+        return studentPointService.getStudentPoints(studentId);
+    }
+
+    public List<StudentPointsRecord> listStudentPointsRecords(int studentId) {
+        return studentPointService.listStudentPointsRecords(studentId);
     }
 }

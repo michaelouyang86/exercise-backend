@@ -4,7 +4,7 @@ info:
   version: 1.0.0
 
 paths:
-  /authentication/users:
+  /v1/authentication/users:
     post:
       summary: Authenticate student and teacher and return a JWT token
       operationId: getUserToken
@@ -24,7 +24,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
 
-  /authentication/admins:
+  /v1/authentication/admins:
     post:
       summary: Authenticate admin and return a JWT token
       operationId: getAdminToken
@@ -44,7 +44,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdminTokenResponse'
 
-  /student/teachers:
+  /v1/student/teachers:
     get:
       summary: List all teachers
       operationId: listTeachersForStudent
@@ -62,7 +62,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherForStudentResponse'
 
-  /student/teachers/{teacherId}/availabilities:
+  /v1/student/teachers/{teacherId}/availabilities:
     get:
       summary: Fetch teacher availability for a specific week
       operationId: fetchTeacherAvailabilities
@@ -92,7 +92,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherAvailabilityResponse'
 
-  /student/schedules:
+  /v1/student/schedules:
     post:
       summary: Schedule a new class
       operationId: scheduleClass
@@ -136,7 +136,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ScheduledClassResponse'
 
-  /student/schedules/{scheduleId}:
+  /v1/student/schedules/{scheduleId}:
     delete:
       summary: Cancel a scheduled class
       operationId: cancelClass
@@ -154,7 +154,39 @@ paths:
         '204':
           description: Class deleted
 
-  /teacher/availability/recurring:
+  /v1/student/points:
+    get:
+      summary: Get student points
+      operationId: getStudentPoints
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Student points
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPointsResponse'
+
+  /v1/student/points/records:
+    get:
+      summary: List student points records
+      operationId: listStudentPointsRecords
+      tags:
+        - Student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of student points records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentPointsRecordsResponse'
+
+  /v1/teacher/availability/recurring:
     post:
       summary: Add a recurring availability slot
       operationId: addTeacherRecurringAvailability
@@ -187,7 +219,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherRecurringAvailabilityResponse'
 
-  /teacher/availability/recurring/{recurringId}:
+  /v1/teacher/availability/recurring/{recurringId}:
     delete:
       summary: Delete a recurring availability slot
       operationId: deleteTeacherRecurringAvailability
@@ -205,7 +237,7 @@ paths:
         '204':
           description: Slot deleted
 
-  /teacher/availability/exceptions:
+  /v1/teacher/availability/exceptions:
     post:
       summary: Add an availability exception
       operationId: addTeacherExceptionAvailability
@@ -238,7 +270,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherExceptionAvailabilityResponse'
 
-  /teacher/availability/exceptions/{exceptionId}:
+  /v1/teacher/availability/exceptions/{exceptionId}:
     delete:
       summary: Delete an availability exception
       operationId: deleteTeacherExceptionAvailability
@@ -256,7 +288,7 @@ paths:
         '204':
           description: Exception deleted
 
-  /teacher/unavailable-dates:
+  /v1/teacher/unavailable-dates:
     post:
       summary: Add an unavailable date
       operationId: addTeacherUnavailableDate
@@ -289,7 +321,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherUnavailableDateResponse'
 
-  /teacher/unavailable-dates/{unavailableDateId}:
+  /v1/teacher/unavailable-dates/{unavailableDateId}:
     delete:
       summary: Delete an unavailable date
       operationId: deleteTeacherUnavailableDate
@@ -307,7 +339,7 @@ paths:
         '204':
           description: Date deleted
 
-  /admin/students:
+  /v1/admin/students:
     post:
       summary: Create a new student
       operationId: createStudent
@@ -325,7 +357,7 @@ paths:
         '201':
           description: Student created
 
-  /admin/students/{studentPhone}:
+  /v1/admin/students/{studentPhone}:
     get:
       summary: Get student by phone
       operationId: getStudentByPhone
@@ -347,7 +379,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StudentResponse'
 
-  /admin/students/{studentId}:
+  /v1/admin/students/{studentId}:
     delete:
       summary: Delete a student
       operationId: deleteStudent
@@ -365,7 +397,7 @@ paths:
         '204':
           description: Student deleted
 
-  /admin/teachers:
+  /v1/admin/teachers:
     post:
       summary: Create a new teacher
       operationId: createTeacher
@@ -399,7 +431,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeacherForAdminResponse'
 
-  /admin/teachers/{teacherId}:
+  /v1/admin/teachers/{teacherId}:
     delete:
       summary: Delete a teacher
       operationId: deleteTeacher
@@ -476,6 +508,32 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    StudentPointsResponse:
+      type: object
+      properties:
+        points:
+          type: integer
+
+    StudentPointsRecordsResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentPointsRecordResponse'
+    
+    StudentPointsRecordResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        adjustedPoints:
+          type: integer
+        reason:
+          type: string
+        pointsAfterAdjustment:
+          type: integer
 
     CreateStudentRequest:
       type: object

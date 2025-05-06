@@ -39,7 +39,7 @@ public class UserRepository {
     public User getUserByPhone(String phone) {
         String sql = """
             SELECT
-                id, name, phone, email, password, role, created_at
+                id, name, phone, email, password, role
             FROM users
             WHERE phone = ?;""";
         try {
@@ -49,6 +49,16 @@ public class UserRepository {
             String message = String.format("User not found for phone: %s", phone);
             throw new NotFoundException(code, message, ex);
         }
+    }
+
+    public TeacherIdAndName getTeacherIdAndName(int id) {
+        String sql = """
+            SELECT
+                id, name
+            FROM users
+            WHERE id = ?
+            AND role = ?;""";
+        return jdbcTemplate.queryForObject(sql, teacherIdAndNameRowMapper, id, TEACHER);
     }
 
     public List<TeacherIdAndName> listTeachersIdAndName() {

@@ -20,6 +20,15 @@ public class StudentPointRepository {
         jdbcTemplate.update(sql, studentId, points);
     }
 
+    public int getStudentPoints(int studentId) {
+        String sql = """
+            SELECT
+                points
+            FROM student_points
+            WHERE student_id = ?;""";
+        return jdbcTemplate.queryForObject(sql, Integer.class, studentId);
+    }
+
     public int getStudentPointsForUpdate(int studentId) {
         String sql = """
             SELECT

@@ -58,7 +58,8 @@ openApiGenerate {
   modelPackage = 'com.michael.exercise.dtos'
   configOptions = [
     useSpringBoot3: "true",
-    interfaceOnly: "true"
+    interfaceOnly: "true",
+	useTags: "true"
   ]
 }
 
