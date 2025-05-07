@@ -19,11 +19,11 @@ public interface StudentPointMapper {
     }
 
     default StudentPointsRecordsResponse toStudentPointsRecordsResponse(List<StudentPointsRecord> studentPointsRecords) {
-        List<StudentPointsRecordResponse> records = studentPointsRecords.stream()
+        List<StudentPointsRecordResponse> pointsRecords = studentPointsRecords.stream()
             .map(this::toStudentPointsRecordResponse)
             .toList();
         StudentPointsRecordsResponse response = new StudentPointsRecordsResponse();
-        response.setRecords(records);
+        response.setPointsRecords(pointsRecords);
         return response;
     }
 

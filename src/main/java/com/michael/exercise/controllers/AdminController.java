@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.michael.exercise.dtos.CreateStudentRequest;
 import com.michael.exercise.dtos.CreateTeacherRequest;
 import com.michael.exercise.dtos.StudentResponse;
-import com.michael.exercise.dtos.TeacherForAdminResponse;
+import com.michael.exercise.dtos.TeachersForAdminResponse;
 import com.michael.exercise.mappers.StudentMapper;
 import com.michael.exercise.mappers.TeacherMapper;
 import com.michael.exercise.models.Student;
@@ -60,9 +60,9 @@ public class AdminController implements AdminApi {
     }
 
     @Override
-    public ResponseEntity<List<TeacherForAdminResponse>> listTeachersForAdmin() {
+    public ResponseEntity<TeachersForAdminResponse> listTeachersForAdmin() {
         List<Teacher> teachers = adminService.listTeachersForAdmin();
-        List<TeacherForAdminResponse> response = teacherMapper.toTeacherForAdminResponseList(teachers);
+        TeachersForAdminResponse response = teacherMapper.toTeachersForAdminResponse(teachers);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);

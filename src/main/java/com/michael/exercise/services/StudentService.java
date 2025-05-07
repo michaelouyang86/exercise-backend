@@ -135,7 +135,7 @@ public class StudentService {
         scheduledClassRepository.scheduleClass(studentId, request);
         // Deduct points from the student
         String teacherName = userRepository.getTeacherIdAndName(request.getTeacherId()).getName();
-        String reason = String.format("[預約課程] %s, %s, %s", teacherName, request.getClassDate(), request.getStartTime());
+        String reason = String.format("[預約課程] %s, %s, %s", teacherName, request.getClassDate(), request.getStartTime().substring(0, 5));
         studentPointService.deductOnePointFromStudent(studentId, currentPoints, reason);
     }
 
@@ -143,11 +143,12 @@ public class StudentService {
         return scheduledClassRepository.getScheduledClass(id);
     }
 
-    public List<ScheduledClassWithName> listScheduledClasses(int studentId, boolean isPast) {
-        if (isPast) {
-            return scheduledClassRepository.listStudentPastScheduledClasses(studentId);
-        }
-        return scheduledClassRepository.listStudentScheduledClasses(studentId);
+    public List<ScheduledClassWithName> listUpcomingScheduledClasses(int studentId) {
+        return scheduledClassRepository.listUpcomingScheduledClasses(studentId);
+    }
+
+    public List<ScheduledClassWithName> listPastScheduledClasses(int studentId) {
+        return scheduledClassRepository.listPastScheduledClasses(studentId);
     }
 
     @Transactional

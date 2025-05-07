@@ -46,7 +46,7 @@ public class ScheduledClassRepository {
         return jdbcTemplate.queryForObject(sql, scheduledClassWithNameRowMapper, id);
     }
 
-    public List<ScheduledClassWithName> listStudentScheduledClasses(int studentId) {
+    public List<ScheduledClassWithName> listUpcomingScheduledClasses(int studentId) {
         String sql = """
             SELECT
                 sc.id, sc.student_id, student_user.name AS student_name,
@@ -61,7 +61,7 @@ public class ScheduledClassRepository {
         return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, studentId);
     }
 
-    public List<ScheduledClassWithName> listStudentPastScheduledClasses(int studentId) {
+    public List<ScheduledClassWithName> listPastScheduledClasses(int studentId) {
         String sql = """
             SELECT
                 sc.id, sc.student_id, student_user.name AS student_name,

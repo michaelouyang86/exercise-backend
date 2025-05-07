@@ -20,7 +20,7 @@ public class StudentPointService {
     public void initializeStudentPoints(int studentId, int points) {
         studentPointRepository.createStudentPoint(studentId, points);
         if (points > 0) {
-            String reason = String.format("購買課程: %d 堂", points);
+            String reason = String.format("[購買課程] %d 堂", points);
             studentPointRecordRepository.addStudentPointRecord(studentId, points, reason, points);
         }
     }

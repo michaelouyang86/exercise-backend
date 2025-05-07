@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.michael.exercise.dtos.AddTeacherExceptionAvailabilityRequest;
 import com.michael.exercise.dtos.AddTeacherRecurringAvailabilityRequest;
 import com.michael.exercise.dtos.AddTeacherUnavailableDateRequest;
-import com.michael.exercise.dtos.TeacherExceptionAvailabilityResponse;
-import com.michael.exercise.dtos.TeacherRecurringAvailabilityResponse;
-import com.michael.exercise.dtos.TeacherUnavailableDateResponse;
-import com.michael.exercise.mappers.TeacherMapper;
+import com.michael.exercise.dtos.TeacherExceptionAvailabilitiesResponse;
+import com.michael.exercise.dtos.TeacherRecurringAvailabilitiesResponse;
+import com.michael.exercise.dtos.TeacherUnavailableDatesResponse;
+import com.michael.exercise.mappers.TeacherAvailabilityMapper;
 import com.michael.exercise.models.AddTeacherExceptionAvailability;
 import com.michael.exercise.models.AddTeacherRecurringAvailability;
 import com.michael.exercise.models.TeacherExceptionAvailability;
@@ -28,12 +28,12 @@ import lombok.AllArgsConstructor;
 public class TeacherController implements TeacherApi {
 
     private final TeacherService teacherService;
-    private final TeacherMapper teacherMapper;
+    private final TeacherAvailabilityMapper teacherAvailabilityMapper;
 
     @Override
     public ResponseEntity<Void> addTeacherRecurringAvailability(AddTeacherRecurringAvailabilityRequest request) {
         int teacherId = SecurityUtil.getUserId();
-        AddTeacherRecurringAvailability recurringAvailability = teacherMapper.toAddTeacherRecurringAvailability(teacherId, request);
+        AddTeacherRecurringAvailability recurringAvailability = teacherAvailabilityMapper.toAddTeacherRecurringAvailability(teacherId, request);
         teacherService.addTeacherRecurringAvailability(recurringAvailability);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -41,10 +41,10 @@ public class TeacherController implements TeacherApi {
     }
 
     @Override
-    public ResponseEntity<List<TeacherRecurringAvailabilityResponse>> listTeacherRecurringAvailabilities() {
+    public ResponseEntity<TeacherRecurringAvailabilitiesResponse> listTeacherRecurringAvailabilities() {
         int teacherId = SecurityUtil.getUserId();
         List<TeacherRecurringAvailability> teacherRecurringAvailabilities = teacherService.listTeacherRecurringAvailabilities(teacherId);
-        List<TeacherRecurringAvailabilityResponse> response = teacherMapper.toRecurringAvailabilityResponseList(teacherRecurringAvailabilities);
+        TeacherRecurringAvailabilitiesResponse response = teacherAvailabilityMapper.toTeacherRecurringAvailabilitiesResponse(teacherRecurringAvailabilities);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
@@ -62,7 +62,7 @@ public class TeacherController implements TeacherApi {
     @Override
     public ResponseEntity<Void> addTeacherExceptionAvailability(AddTeacherExceptionAvailabilityRequest request) {
         int teacherId = SecurityUtil.getUserId();
-        AddTeacherExceptionAvailability exceptionAvailability = teacherMapper.toAddTeacherExceptionAvailability(teacherId, request);
+        AddTeacherExceptionAvailability exceptionAvailability = teacherAvailabilityMapper.toAddTeacherExceptionAvailability(teacherId, request);
         teacherService.addTeacherExceptionAvailability(exceptionAvailability);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -70,10 +70,10 @@ public class TeacherController implements TeacherApi {
     }
 
     @Override
-    public ResponseEntity<List<TeacherExceptionAvailabilityResponse>> listUpcomingTeacherExceptionAvailabilities() {
+    public ResponseEntity<TeacherExceptionAvailabilitiesResponse> listUpcomingTeacherExceptionAvailabilities() {
         int teacherId = SecurityUtil.getUserId();
         List<TeacherExceptionAvailability> teacherExceptionAvailabilities = teacherService.listUpcomingTeacherExceptionAvailabilities(teacherId);
-        List<TeacherExceptionAvailabilityResponse> response = teacherMapper.toTeacherExceptionAvailabilityResponseList(teacherExceptionAvailabilities);
+        TeacherExceptionAvailabilitiesResponse response = teacherAvailabilityMapper.toTeacherExceptionAvailabilitiesResponse(teacherExceptionAvailabilities);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
@@ -98,10 +98,10 @@ public class TeacherController implements TeacherApi {
     }
 
     @Override
-    public ResponseEntity<List<TeacherUnavailableDateResponse>> listUpcomingTeacherUnavailableDates() {
+    public ResponseEntity<TeacherUnavailableDatesResponse> listUpcomingTeacherUnavailableDates() {
         int teacherId = SecurityUtil.getUserId();
         List<TeacherUnavailableDate> teacherUnavailableDates = teacherService.listUpcomingTeacherUnavailableDates(teacherId);
-        List<TeacherUnavailableDateResponse> response = teacherMapper.toTeacherUnavailableDateResponseList(teacherUnavailableDates);
+        TeacherUnavailableDatesResponse response = teacherAvailabilityMapper.toTeacherUnavailableDatesResponse(teacherUnavailableDates);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
