@@ -46,7 +46,7 @@ public class ScheduledClassRepository {
         return jdbcTemplate.queryForObject(sql, scheduledClassWithNameRowMapper, id);
     }
 
-    public List<ScheduledClassWithName> listUpcomingScheduledClasses(int studentId) {
+    public List<ScheduledClassWithName> listStudentScheduledClasses(int studentId, LocalDate startDate, LocalDate endDate) {
         String sql = """
             SELECT
                 sc.id, sc.student_id, student_user.name AS student_name,
@@ -56,12 +56,13 @@ public class ScheduledClassRepository {
             JOIN users student_user ON sc.student_id = student_user.id
             JOIN users teacher_user ON sc.teacher_id = teacher_user.id
             WHERE sc.student_id = ?
-            AND sc.class_date >= CURRENT_DATE
+            AND sc.class_date >= ?
+            AND sc.class_date <= ?
             ORDER BY sc.class_date, sc.start_time;""";
-        return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, studentId);
+        return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, studentId, startDate, endDate);
     }
 
-    public List<ScheduledClassWithName> listPastScheduledClasses(int studentId) {
+    public List<ScheduledClassWithName> listTeacherScheduledClasses(int teacherId, LocalDate startDate, LocalDate endDate) {
         String sql = """
             SELECT
                 sc.id, sc.student_id, student_user.name AS student_name,
@@ -70,17 +71,25 @@ public class ScheduledClassRepository {
             FROM scheduled_classes sc
             JOIN users student_user ON sc.student_id = student_user.id
             JOIN users teacher_user ON sc.teacher_id = teacher_user.id
-            WHERE sc.student_id = ?
-            AND sc.class_date < CURRENT_DATE
+            WHERE sc.teacher_id = ?
+            AND sc.class_date >= ?
+            AND sc.class_date <= ?
             ORDER BY sc.class_date, sc.start_time;""";
-        return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, studentId);
+        return jdbcTemplate.query(sql, scheduledClassWithNameRowMapper, teacherId, startDate, endDate);
     }
 
-    public int cancelClass(int studentId, int scheduledClassId) {
+    public int cancelStudentClass(int studentId, int scheduledClassId) {
         String sql = """
             DELETE FROM scheduled_classes
             WHERE student_id = ? AND id = ?;""";
         return jdbcTemplate.update(sql, studentId, scheduledClassId);
+    }
+
+    public int cancelTeacherClass(int teacherId, int scheduledClassId) {
+        String sql = """
+            DELETE FROM scheduled_classes
+            WHERE teacher_id = ? AND id = ?;""";
+        return jdbcTemplate.update(sql, teacherId, scheduledClassId);
     }
 
     public List<ScheduledClass> listTeacherScheduledClasses(int teacherId, LocalDate classDate) {

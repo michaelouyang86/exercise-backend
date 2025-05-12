@@ -1,5 +1,6 @@
 package com.michael.exercise.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -11,10 +12,14 @@ import com.michael.exercise.dtos.AddTeacherRecurringAvailabilityRequest;
 import com.michael.exercise.dtos.AddTeacherUnavailableDateRequest;
 import com.michael.exercise.dtos.TeacherExceptionAvailabilitiesResponse;
 import com.michael.exercise.dtos.TeacherRecurringAvailabilitiesResponse;
+import com.michael.exercise.dtos.TeacherScheduledClassesResponse;
 import com.michael.exercise.dtos.TeacherUnavailableDatesResponse;
+import com.michael.exercise.exception.BadRequestException;
+import com.michael.exercise.mappers.ScheduledClassMapper;
 import com.michael.exercise.mappers.TeacherAvailabilityMapper;
 import com.michael.exercise.models.AddTeacherExceptionAvailability;
 import com.michael.exercise.models.AddTeacherRecurringAvailability;
+import com.michael.exercise.models.ScheduledClassWithName;
 import com.michael.exercise.models.TeacherExceptionAvailability;
 import com.michael.exercise.models.TeacherRecurringAvailability;
 import com.michael.exercise.models.TeacherUnavailableDate;
@@ -28,7 +33,40 @@ import lombok.AllArgsConstructor;
 public class TeacherController implements TeacherApi {
 
     private final TeacherService teacherService;
+    private final ScheduledClassMapper scheduledClassMapper;
     private final TeacherAvailabilityMapper teacherAvailabilityMapper;
+
+    @Override
+    public ResponseEntity<TeacherScheduledClassesResponse> listTeacherScheduledClasses(LocalDate startDate, LocalDate endDate) {
+        int teacherId = SecurityUtil.getUserId();
+        // Start date defaults to today
+        if (startDate == null) {
+            startDate = LocalDate.now();
+        }
+        // End date defaults to forever
+        if (endDate == null) {
+            endDate = LocalDate.of(9999, 12, 31);
+        }
+        // Validate date range
+        if (startDate.isAfter(endDate)) {
+            throw new BadRequestException("invalid_date_range", "日期範圍錯誤");
+        }
+        List<ScheduledClassWithName> scheduledClassesWithName = teacherService.listScheduledClasses(teacherId, startDate, endDate);
+        TeacherScheduledClassesResponse response = scheduledClassMapper.toTeacherScheduledClassesResponse(scheduledClassesWithName);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> cancelClassByTeacher(Integer scheduleId) {
+        int teacherId = SecurityUtil.getUserId();
+        ScheduledClassWithName scheduledClassWithName = teacherService.getScheduledClass(scheduleId);
+        teacherService.cancelClass(teacherId, scheduledClassWithName);
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
 
     @Override
     public ResponseEntity<Void> addTeacherRecurringAvailability(AddTeacherRecurringAvailabilityRequest request) {

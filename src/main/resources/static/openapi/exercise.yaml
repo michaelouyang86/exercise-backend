@@ -79,7 +79,7 @@ paths:
           required: true
           schema:
             type: string
-            example: '2025-W20'
+            example: '2025-W21'
       responses:
         '200':
           description: Teacher's availability for the given week
@@ -105,43 +105,40 @@ paths:
       responses:
         '201':
           description: Class scheduled
-    
-  /v1/student/schedules/upcoming:
     get:
-      summary: List upcoming scheduled classes
-      operationId: listUpcomingScheduledClasses
+      summary: List scheduled classes for the student
+      operationId: listStudentScheduledClasses
       tags:
         - Student
       security:
         - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          description: Default to today
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          description: Default to forever
+          schema:
+            type: string
+            format: date
       responses:
         '200':
-          description: List of upcoming schedules
+          description: List of scheduled classes for the student
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScheduledClassesResponse'
-
-  /v1/student/schedules/past:
-    get:
-      summary: List past scheduled classes
-      operationId: listPastScheduledClasses
-      tags:
-        - Student
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: List of past schedules
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ScheduledClassesResponse'
+                $ref: '#/components/schemas/StudentScheduledClassesResponse'
 
   /v1/student/schedules/{scheduleId}:
     delete:
-      summary: Cancel a scheduled class
-      operationId: cancelClass
+      summary: Cancel a scheduled class by student
+      operationId: cancelClassByStudent
       tags:
         - Student
       security:
@@ -187,6 +184,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentPointsRecordsResponse'
+
+  /v1/teacher/schedules:
+    get:
+      summary: List scheduled classes for the teacher
+      operationId: listTeacherScheduledClasses
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          description: Default to today
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          description: Default to forever
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of scheduled classes for the teacher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeacherScheduledClassesResponse'
+
+  /v1/teacher/schedules/{scheduleId}:
+    delete:
+      summary: Cancel a scheduled class by teacher
+      operationId: cancelClassByTeacher
+      tags:
+        - Teacher
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Class deleted
 
   /v1/teacher/availabilities/recurring:
     post:
@@ -722,20 +768,42 @@ components:
           type: string
           format: time
 
-    ScheduledClassesResponse:
+    StudentScheduledClassesResponse:
       type: object
       properties:
         scheduledClasses:
           type: array
           items:
-            $ref: '#/components/schemas/ScheduledClassResponse'
+            $ref: '#/components/schemas/StudentScheduledClassResponse'
 
-    ScheduledClassResponse:
+    StudentScheduledClassResponse:
       type: object
       properties:
         id:
           type: integer
         teacherName:
+          type: string
+        classDate:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: time
+
+    TeacherScheduledClassesResponse:
+      type: object
+      properties:
+        scheduledClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeacherScheduledClassResponse'
+
+    TeacherScheduledClassResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentName:
           type: string
         classDate:
           type: string

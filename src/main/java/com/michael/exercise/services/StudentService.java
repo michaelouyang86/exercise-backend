@@ -143,18 +143,14 @@ public class StudentService {
         return scheduledClassRepository.getScheduledClass(id);
     }
 
-    public List<ScheduledClassWithName> listUpcomingScheduledClasses(int studentId) {
-        return scheduledClassRepository.listUpcomingScheduledClasses(studentId);
-    }
-
-    public List<ScheduledClassWithName> listPastScheduledClasses(int studentId) {
-        return scheduledClassRepository.listPastScheduledClasses(studentId);
+    public List<ScheduledClassWithName> listScheduledClasses(int studentId, LocalDate startDate, LocalDate endDate) {
+        return scheduledClassRepository.listStudentScheduledClasses(studentId, startDate, endDate);
     }
 
     @Transactional
     public void cancelClass(int studentId, ScheduledClassWithName scheduledClassWithName) {
         // Cancel the scheduled class
-        int affectedRows = scheduledClassRepository.cancelClass(studentId, scheduledClassWithName.getId());
+        int affectedRows = scheduledClassRepository.cancelStudentClass(studentId, scheduledClassWithName.getId());
         if (affectedRows != 1) {
             throw new BadRequestException("cancel_class_failed", "取消預約失敗");
         }
