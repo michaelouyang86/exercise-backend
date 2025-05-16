@@ -1,16 +1,24 @@
-# To build the Docker image, run the following command in the terminal:
+# To build the Docker image, use the following command:
 # docker build -t exercise-backend:latest .
+
+# To run the Docker container, use the following command:
+# Replace ${JWT_SECRET} with your actual JWT secret
+# Replace ${DB_HOST}, ${DB_USERNAME}, and ${DB_PASSWORD} with your actual database credentials
+# docker run -p 8080:8080 -e JWT_SECRET="${JWT_SECRET}" -e DB_HOST="${DB_HOST}" -e DB_USERNAME="${DB_USERNAME}" -e DB_PASSWORD="${DB_PASSWORD}" exercise-backend:latest
 
 # 1. Build the app
 
 # Use openjdk as the base image for building the app
-FROM openjdk:21-slim AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 # Set the working directory
 WORKDIR /app
 
 # Copy gradlew and gradle files
 COPY gradlew build.gradle settings.gradle ./
+
+# Make gradlew executable
+RUN chmod +x gradlew
 
 # Copy the gradle wrapper
 COPY gradle ./gradle
@@ -19,10 +27,10 @@ COPY gradle ./gradle
 COPY src ./src
 
 # Build the app, this will create a jar file in the build/libs directory
-RUN ./gradlew test build --no-daemon
+RUN ./gradlew build --no-daemon
 
 # Stage 2: Runtime
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jre-alpine
 
 # Set the working directory
 WORKDIR /app
